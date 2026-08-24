@@ -1,10 +1,10 @@
 import type { LandingBlock } from '../types/landing';
 
 export const mockLandingConfig: LandingBlock[] = [
-  // 1. IMG
-  { id: 'b1', type: 'image', src: '/defaults/01.jpeg', alt: 'Presentación Spray Propóleo' },
-  
-  // 2. COMPRAR AHORA
+  // 1. IMAGEN 1
+  { id: 'b1', type: 'image', src: '/defaults/01.jpeg', alt: 'Imagen 1' },
+
+  // 2. BOTON
   {
     id: 'b2',
     type: 'button',
@@ -12,120 +12,96 @@ export const mockLandingConfig: LandingBlock[] = [
     subtext: '🔥 Antes de que se agoten 🔥',
     variant: 'pulse',
   },
-  
-  // 3. ULTIMAS UNIDADES (Banner destacador)
+
+  // 3. IMAGEN 2
+  { id: 'b3', type: 'image', src: '/defaults/02.jpeg', alt: 'Imagen 2' },
+
+  // 4. IMAGEN 3
+  { id: 'b4', type: 'image', src: '/defaults/03.jpeg', alt: 'Imagen 3' },
+
+  // 5. BOTON
   {
-    id: 'b3',
-    type: 'banner',
-    src: '/defaults/08.jpeg',
-    badgeText: '🔥 ¡ÚLTIMAS UNIDADES DISPONIBLES EN STOCK!',
+    id: 'b5',
+    type: 'button',
+    text: '¡QUIERO HACER MI PEDIDO!',
+    subtext: '🔥 Antes de que se agoten 🔥',
+    variant: 'pulse',
   },
-  
-  // 4. IMG
-  { id: 'b4', type: 'image', src: '/defaults/02.jpeg', alt: 'Beneficios Principales' },
-  
-  // 5. IMG
-  { id: 'b5', type: 'image', src: '/defaults/03.jpeg', alt: 'Modo de Uso' },
-  
-  // 6. COMPRAR AHORA
+
+  // 6. BANNER FARMACIAS
   {
     id: 'b6',
+    type: 'banner',
+    src: '/defaults/banner-farmacias.webp',
+    badgeText: 'Farmacias Disponibles',
+  },
+
+  // 7. IMAGEN 4
+  { id: 'b7', type: 'image', src: '/defaults/04.jpeg', alt: 'Imagen 4' },
+
+  // 8. IMAGEN 5
+  { id: 'b8', type: 'image', src: '/defaults/05.jpeg', alt: 'Imagen 5' },
+
+  // 9. IMAGEN 6
+  { id: 'b9', type: 'image', src: '/defaults/06.jpeg', alt: 'Imagen 6' },
+
+  // 10. BOTON
+  {
+    id: 'b10',
     type: 'button',
     text: '¡QUIERO HACER MI PEDIDO!',
     subtext: '🔥 Antes de que se agoten 🔥',
     variant: 'pulse',
   },
-  
-  // 7. ULTIMAS UNIDADES
-  {
-    id: 'b7',
-    type: 'banner',
-    src: '/defaults/03.jpeg',
-    badgeText: '⚡ ¡ÚLTIMAS UNIDADES CON PAGO CONTRA ENTREGA!',
-  },
-  
-  // 8. BANNER
-  {
-    id: 'b8',
-    type: 'banner',
-    src: '/defaults/04.jpeg',
-    badgeText: '🚚 ENVÍOS A TODO EL PAÍS',
-  },
-  
-  // 9. IMG
-  { id: 'b9', type: 'image', src: '/defaults/05.jpeg', alt: 'Testimonios de Clientes' },
-  
-  // 10. IMG
-  { id: 'b10', type: 'image', src: '/defaults/06.jpeg', alt: 'Ingredientes Naturales' },
-  
-  // 11. IMG
-  { id: 'b11', type: 'image', src: '/defaults/07.jpeg', alt: 'Garantía de Calidad' },
-  
-  // 12. COMPRAR AHORA
-  {
-    id: 'b12',
-    type: 'button',
-    text: '¡QUIERO HACER MI PEDIDO!',
-    subtext: '🔥 Antes de que se agoten 🔥',
-    variant: 'pulse',
-  },
-  
-  // 13. ULTIMAS UNIDADES
+
+  // 11. IMAGEN 7
+  { id: 'b11', type: 'image', src: '/defaults/07.jpeg', alt: 'Imagen 7' },
+
+  // 12. IMAGEN 8
+  { id: 'b12', type: 'image', src: '/defaults/08.jpeg', alt: 'Imagen 8' },
+
+  // 13. BOTON
   {
     id: 'b13',
-    type: 'banner',
-    src: '/defaults/08.jpeg',
-    badgeText: '🔥 ÚLTIMAS UNIDADES CON 40% DE DESCUENTO',
+    type: 'button',
+    text: '¡QUIERO HACER MI PEDIDO!',
+    subtext: '🔥 Antes de que se agoten 🔥',
+    variant: 'pulse',
   },
-  
-  // 14. IMG
-  { id: 'b14', type: 'image', src: '/defaults/08.jpeg', alt: 'Certificación y Registro' },
-  
-  // 15. IMG
-  { id: 'b15', type: 'image', src: '/defaults/09.jpeg', alt: 'Preguntas Frecuentes' },
-  
-  // 16. COMPRAR AHORA
+
+  // 14. BANNER SHALOM
+  {
+    id: 'b14',
+    type: 'banner',
+    src: '/defaults/banner-shalom.webp',
+    badgeText: 'Shalom',
+  },
+
+  // 15. IMAGEN 9
+  { id: 'b15', type: 'image', src: '/defaults/09.jpeg', alt: 'Imagen 9' },
+
+  // 16. BANNER FARMACIAS
   {
     id: 'b16',
-    type: 'button',
-    text: '¡QUIERO HACER MI PEDIDO!',
-    subtext: '🔥 Antes de que se agoten 🔥',
-    variant: 'pulse',
+    type: 'banner',
+    src: '/defaults/banner-farmacias.webp',
+    badgeText: 'Farmacias Disponibles',
   },
-  
-  // 17. BANNER
+
+  // 17. BOTON
   {
     id: 'b17',
-    type: 'banner',
-    src: '/defaults/03.jpeg',
-    badgeText: '🛡️ GARANTÍA DE SATISFACCIÓN 100%',
-  },
-  
-  // 18. IMG
-  { id: 'b18', type: 'image', src: '/defaults/01.jpeg', alt: 'Spray Propóleo Promocional' },
-  
-  // 19. BANNER
-  {
-    id: 'b19',
-    type: 'banner',
-    src: '/defaults/04.jpeg',
-    badgeText: '📦 PAGO CONTRA ENTREGA - RECIBE Y PAGA EN CASA',
-  },
-  
-  // 20. COMPRAR AHORA
-  {
-    id: 'b20',
     type: 'button',
     text: '¡QUIERO HACER MI PEDIDO!',
     subtext: '🔥 Antes de que se agoten 🔥',
     variant: 'pulse',
   },
-  
-  // 21. BANNER
+
+  // 18. BANNER ENVIOS
   {
-    id: 'b21',
+    id: 'b18',
     type: 'banner',
-    src: '/defaults/08.jpeg',
-    badgeText: '⚡ ¡OFERTA POR TIEMPO LIMITADO!',
+    src: '/defaults/banner-envio-gratis.webp',
+    badgeText: 'Envío Gratis',
   },
 ];
