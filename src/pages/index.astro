@@ -1,11 +1,58 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import DynamicBlockRenderer from '../components/builder/DynamicBlockRenderer.astro';
+import CheckoutModal from '../components/checkout/CheckoutModal.astro';
+import ExitIntentModal from '../components/retention/ExitIntentModal.astro';
+import { mockLandingConfig } from '../data/mockLandingConfig';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const landingBlocks = mockLandingConfig;
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Spray de Propóleo Natural | Promoción Exclusiva Contra Entrega">
+  <!-- Top Announcement Bar (Relative flow so it never overlaps or covers content when scrolling) -->
+  <div class="w-full relative bg-gradient-to-r from-red-600 via-amber-600 to-red-600 text-white text-center py-2.5 px-3 text-xs sm:text-sm font-extrabold shadow-md flex items-center justify-center gap-2 uppercase tracking-wide">
+    <span class="animate-pulse">🔥</span>
+    <span>OFERTA DE HOY: HASTA 40% OFF + ENVÍO GRATIS Y PAGO CONTRA ENTREGA</span>
+  </div>
+
+  <main class="w-full max-w-xl mx-auto flex flex-col items-center pb-28">
+    <!-- Dynamic Block Renderer (Renders exact JSON block sequence) -->
+    <DynamicBlockRenderer blocks={landingBlocks} />
+  </main>
+
+  <!-- Checkout Dialog/Modal -->
+  <CheckoutModal />
+
+  <!-- Exit Intent Retention Modal -->
+  <ExitIntentModal />
+
+  <!-- ALWAYS ANCHORED STICKY BOTTOM BUTTON (Fijo en la parte inferior siempre) -->
+  <div class="fixed bottom-0 inset-x-0 z-40 p-2 sm:p-3 bg-slate-950/95 backdrop-blur-md border-t border-slate-800/80 shadow-2xl flex justify-center">
+    <div class="w-full max-w-xl px-2">
+      <button
+        id="anchored-sticky-cta"
+        class="w-full group relative flex flex-col items-center justify-center py-3.5 px-4 rounded-2xl bg-[#00c853] hover:bg-[#00e676] text-white font-black shadow-lg shadow-emerald-600/40 cursor-pointer active:scale-95 transition-all duration-200"
+      >
+        <span class="text-xl sm:text-2xl font-black tracking-wide uppercase leading-tight drop-shadow">
+          ¡QUIERO HACER MI PEDIDO!
+        </span>
+        <span class="text-xs sm:text-sm font-bold text-amber-200 mt-0.5 flex items-center justify-center gap-1">
+          🔥 Antes de que se agoten 🔥
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    import { isCheckoutModalOpen } from '../stores/checkoutStore';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const anchoredBtn = document.getElementById('anchored-sticky-cta');
+      if (anchoredBtn) {
+        anchoredBtn.addEventListener('click', () => {
+          isCheckoutModalOpen.set(true);
+        });
+      }
+    });
+  </script>
 </Layout>

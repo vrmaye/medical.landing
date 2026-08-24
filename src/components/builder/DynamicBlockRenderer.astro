@@ -1,0 +1,39 @@
+---
+import type { LandingBlock } from '../../types/landing';
+import ImageBlock from './ImageBlock.astro';
+import BannerBlock from './BannerBlock.astro';
+import CTAButton from '../ui/CTAButton.astro';
+
+interface Props {
+  blocks: LandingBlock[];
+}
+
+const { blocks = [] } = Astro.props;
+
+let firstImageFound = false;
+---
+
+<section class="w-full flex flex-col items-center justify-center bg-slate-900 min-h-screen pb-6">
+  {blocks.map((block) => {
+    switch (block.type) {
+      case 'image': {
+        const isFirst = !firstImageFound;
+        if (isFirst) firstImageFound = true;
+        return <ImageBlock block={block} isFirst={isFirst} />;
+      }
+      case 'banner':
+        return <BannerBlock block={block} />;
+      case 'button':
+        return (
+          <CTAButton
+            text={block.text}
+            subtext={block.subtext}
+            variant={block.variant || 'pulse'}
+            class="my-3"
+          />
+        );
+      default:
+        return null;
+    }
+  })}
+</section>

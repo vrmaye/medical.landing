@@ -1,23 +1,70 @@
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
-</html>
+---
+import '../styles/global.css';
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+}
+
+const {
+  title = 'Spray de Propóleo Natural | Oferta Especial Contra Entrega',
+  description = 'Obtén tu Spray de Propóleo Natural con descuento exclusivo y envío gratis a todo el país. Paga únicamente al recibir en casa.',
+  image = '/defaults/01.jpeg',
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || Astro.url);
+const ogImageURL = new URL(image, Astro.site || Astro.url).href;
+---
+
+<!doctype html>
+<html lang="es" class="scroll-smooth bg-slate-950 text-slate-100">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="icon" type="image/jpeg" href="/defaults/01.jpeg" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- SEO Básico & Canonical -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- OpenGraph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:secure_url" content={ogImageURL} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1080" />
+    <meta property="og:image:height" content="1080" />
+    <meta property="og:image:alt" content="Spray de Propóleo Natural - Promoción" />
+    <meta property="og:site_name" content="Spray de Propóleo Natural" />
+    <meta property="og:locale" content="es_PE" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+    <meta name="twitter:image:alt" content="Spray de Propóleo Natural - Promoción" />
+
+    <!-- Performance Preconnect & Resource Hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://wa.me" />
+    <link rel="dns-prefetch" href="https://api.whatsapp.com" />
+
+    <!-- Google Fonts with font-display=swap -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Preload First Hero Image for Ultra-fast LCP -->
+    <link rel="preload" as="image" href="/defaults/01.jpeg" fetchpriority="high" />
+  </head>
+  <body class="font-['Plus_Jakarta_Sans',sans-serif] bg-slate-950 text-slate-100 antialiased min-h-screen selection:bg-amber-500 selection:text-slate-950">
+    <slot />
+  </body>
+</html>

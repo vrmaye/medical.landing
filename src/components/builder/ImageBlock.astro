@@ -1,0 +1,21 @@
+---
+import type { ImageBlockData } from '../../types/landing';
+
+interface Props {
+  block: ImageBlockData;
+  isFirst?: boolean;
+}
+
+const { block, isFirst = false } = Astro.props;
+---
+
+<div class="w-full max-w-xl mx-auto flex justify-center bg-slate-950 min-h-[300px]">
+  <img
+    src={block.src}
+    alt={block.alt || 'Imagen promocional Spray de Propóleo'}
+    class="w-full h-auto object-cover block shadow-md"
+    loading={isFirst ? 'eager' : 'lazy'}
+    fetchpriority={isFirst ? 'high' : 'auto'}
+    decoding={isFirst ? 'sync' : 'async'}
+  />
+</div>

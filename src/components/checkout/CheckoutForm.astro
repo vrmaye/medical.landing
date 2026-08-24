@@ -1,0 +1,253 @@
+---
+import OrderSummary from './OrderSummary.astro';
+import { PERU_LOCATIONS, DEPARTMENTS } from '../../data/peruLocations';
+---
+
+<div id="checkout-section" class="w-full max-w-xl mx-auto px-2 py-4 text-white">
+  <div class="text-center mb-6">
+    <span class="inline-block bg-emerald-500/20 text-emerald-400 font-extrabold text-xs tracking-wider px-3 py-1 rounded-full uppercase mb-2 border border-emerald-500/30">
+      Paso 2: Completa tus Datos de Entrega
+    </span>
+    <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+      DATOS DE ENVÍO Y CONFIRMACIÓN
+    </h2>
+    <p class="text-xs sm:text-sm text-slate-300 mt-1">
+      Un asesor coordinará la entrega contigo por WhatsApp o llamada
+    </p>
+  </div>
+
+  <form id="checkout-form" class="space-y-4">
+    <!-- Nombre Completo -->
+    <div>
+      <label for="fullName" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
+        Nombre Completo *
+      </label>
+      <input
+        type="text"
+        id="fullName"
+        name="fullName"
+        required
+        placeholder="Ej: María García Fernández"
+        class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition"
+      />
+    </div>
+
+    <!-- WhatsApp / Teléfono -->
+    <div>
+      <label for="phone" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
+        WhatsApp / Teléfono de Contacto *
+      </label>
+      <input
+        type="tel"
+        id="phone"
+        name="phone"
+        required
+        placeholder="Ej: 987 654 321"
+        class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition"
+      />
+    </div>
+
+    <!-- Departamento & Distrito (Selects dinámicos con Perú Locations) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- Departamento Select -->
+      <div>
+        <label for="department" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
+          Departamento *
+        </label>
+        <select
+          id="department"
+          name="department"
+          required
+          class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition cursor-pointer"
+        >
+          <option value="" disabled selected>-- Selecciona Departamento --</option>
+          {DEPARTMENTS.map((dept) => (
+            <option value={dept}>{dept}</option>
+          ))}
+        </select>
+      </div>
+
+      <!-- Distrito Select -->
+      <div>
+        <label for="district" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
+          Distrito *
+        </label>
+        <select
+          id="district"
+          name="district"
+          required
+          disabled
+          class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white disabled:opacity-50 placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition cursor-pointer"
+        >
+          <option value="" disabled selected>-- Primero elige Departamento --</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Dirección Exacta -->
+    <div>
+      <label for="address" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
+        Dirección Exacta de Entrega *
+      </label>
+      <input
+        type="text"
+        id="address"
+        name="address"
+        required
+        placeholder="Ej: Av. Larco 123 Dpto 402"
+        class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition"
+      />
+    </div>
+
+    <!-- Referencia -->
+    <div>
+      <label for="reference" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
+        Referencia de Entrega
+      </label>
+      <input
+        type="text"
+        id="reference"
+        name="reference"
+        placeholder="Ej: Frente al parque principal / Cerca de la farmacia"
+        class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition"
+      />
+    </div>
+
+    <!-- Dynamic Order Summary component -->
+    <OrderSummary />
+
+    <!-- Submit Button: REALIZAR PEDIDO -->
+    <button
+      type="submit"
+      id="submit-order-btn"
+      class="w-full py-4 px-6 rounded-2xl bg-[#00c853] hover:bg-[#00e676] text-white font-black text-xl sm:text-2xl uppercase tracking-wider shadow-xl shadow-emerald-600/30 transition transform active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+    >
+      <span>🛒</span>
+      <span id="submit-btn-text">REALIZAR PEDIDO</span>
+    </button>
+  </form>
+</div>
+
+<script>
+  import { checkoutPricing, selectedPackage } from '../../stores/checkoutStore';
+  import { storeConfig } from '../../data/config';
+  import { PERU_LOCATIONS } from '../../data/peruLocations';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('checkout-form') as HTMLFormElement;
+    const submitBtn = document.getElementById('submit-order-btn') as HTMLButtonElement;
+    const submitText = document.getElementById('submit-btn-text');
+    const departmentSelect = document.getElementById('department') as HTMLSelectElement;
+    const districtSelect = document.getElementById('district') as HTMLSelectElement;
+
+    // Handle dynamic District loading based on selected Department
+    if (departmentSelect && districtSelect) {
+      departmentSelect.addEventListener('change', () => {
+        const selectedDept = departmentSelect.value;
+        const districts = PERU_LOCATIONS[selectedDept] || [];
+
+        districtSelect.innerHTML = '<option value="" disabled selected>-- Selecciona Distrito --</option>';
+        districts.forEach((dist) => {
+          const opt = document.createElement('option');
+          opt.value = dist;
+          opt.textContent = dist;
+          districtSelect.appendChild(opt);
+        });
+
+        districtSelect.disabled = false;
+      });
+    }
+
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (submitBtn && submitText) {
+        submitBtn.disabled = true;
+        submitText.textContent = 'PROCESANDO PEDIDO...';
+      }
+
+      const formData = new FormData(form);
+      const fullName = formData.get('fullName')?.toString() || '';
+      const phone = formData.get('phone')?.toString() || '';
+      const department = formData.get('department')?.toString() || '';
+      const district = formData.get('district')?.toString() || '';
+      const address = formData.get('address')?.toString() || '';
+      const reference = formData.get('reference')?.toString() || '';
+
+      const currentPkg = selectedPackage.get();
+      const pricing = checkoutPricing.get();
+
+      const leadPayload = {
+        fullName,
+        phone,
+        department,
+        district,
+        address,
+        reference,
+        packageId: currentPkg.id,
+        packageTitle: currentPkg.title,
+        quantity: currentPkg.quantity,
+        totalBasePrice: pricing.totalBasePrice,
+        packageDiscountAmount: pricing.packageDiscountAmount,
+        extraDiscountPercentage: pricing.extraDiscountPercentage,
+        extraDiscountAmount: pricing.extraDiscountAmount,
+        finalPriceTotal: pricing.finalPriceTotal,
+        shippingCost: pricing.shippingCost,
+        status: 'NUEVO',
+        createdAt: new Date().toISOString(),
+      };
+
+      let targetWhatsappNumber = storeConfig.whatsappNumber;
+
+      try {
+        // 1. Send Lead payload to Backend API
+        const response = await fetch(storeConfig.apiOrderEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(leadPayload),
+        });
+
+        if (response.ok) {
+          const apiResult = await response.json();
+          if (apiResult.whatsappNumber) {
+            targetWhatsappNumber = apiResult.whatsappNumber;
+          }
+        }
+      } catch (err) {
+        console.warn('[Checkout] Fallback enviando orden por error en API:', err);
+      }
+
+      // 2. Format WhatsApp order summary message
+      let extraDiscountLine = '';
+      if (pricing.extraDiscountPercentage > 0) {
+        extraDiscountLine = `🎁 *Descuento Extra Retención:* -${pricing.extraDiscountPercentage}% (-S/ ${pricing.extraDiscountAmount})\n`;
+      }
+
+      const waMessage =
+        `¡Hola! Acabo de hacer un pedido desde la web.\n\n` +
+        `📦 *Producto:* ${currentPkg.title}\n` +
+        `👤 *Cliente:* ${fullName}\n` +
+        `📱 *Teléfono:* ${phone}\n` +
+        `📍 *Ubicación:* ${district}, ${department}\n` +
+        `🏠 *Dirección:* ${address}\n` +
+        `🏷️ *Referencia:* ${reference || 'N/A'}\n\n` +
+        extraDiscountLine +
+        `💰 *TOTAL A PAGAR:* S/ ${pricing.finalPriceTotal} (Pago Contra Entrega)\n` +
+        `🚚 *Envío:* ${pricing.shippingCost === 0 ? '¡GRATIS!' : 'S/ ' + pricing.shippingCost}\n\n` +
+        `Quedo a la espera de la confirmación para el envío. ¡Muchas gracias!`;
+
+      // 3. Open WhatsApp link to seller number returned by API
+      const cleanPhone = targetWhatsappNumber.replace(/\D/g, '');
+      const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`;
+
+      if (submitBtn && submitText) {
+        submitBtn.disabled = false;
+        submitText.textContent = 'REALIZAR PEDIDO';
+      }
+
+      window.open(waUrl, '_blank');
+    });
+  });
+</script>

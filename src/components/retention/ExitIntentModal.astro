@@ -1,0 +1,106 @@
+<div
+  id="exit-modal"
+  class="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 backdrop-blur-md p-4 hidden opacity-0 transition-opacity duration-300"
+>
+  <div class="relative w-full max-w-md bg-slate-900 border-2 border-red-500 rounded-3xl p-6 shadow-2xl text-center text-white transform scale-95 transition-transform duration-300">
+    <!-- Close X button -->
+    <button
+      id="close-exit-modal-btn"
+      class="absolute top-3 right-3 text-slate-400 hover:text-white text-xl font-bold w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center cursor-pointer"
+      aria-label="Cerrar aviso de oferta"
+    >
+      ✕
+    </button>
+
+    <div class="inline-block bg-red-500/20 text-red-400 text-xs font-black px-3 py-1 rounded-full uppercase mb-3 border border-red-500/30 animate-bounce">
+      ⚠️ ¡ESPERA! NO TE VAYAS SIN TU REGALO
+    </div>
+
+    <h3 class="text-2xl sm:text-3xl font-black text-amber-400 tracking-tight leading-tight">
+      ¿TE REGALAMOS UN 5% DE DESCUENTO EXTRA?
+    </h3>
+
+    <p class="text-xs sm:text-sm text-slate-300 mt-2">
+      Si completas tu pedido en este momento, te aplicamos un <strong class="text-amber-400 font-extrabold">5% de descuento adicional</strong> a cualquier paquete que elijas.
+    </p>
+
+    <div class="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/40 rounded-2xl p-4 my-4">
+      <div class="text-3xl font-black text-amber-400">
+        +5% OFF EXTRA
+      </div>
+      <div class="text-[11px] text-amber-200 mt-0.5 font-medium">
+        Se aplica automáticamente a tu carrito actual
+      </div>
+    </div>
+
+    <button
+      id="claim-discount-btn"
+      class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-700 text-white font-black text-lg uppercase tracking-wider shadow-lg shadow-orange-500/30 transition transform active:scale-95 cursor-pointer"
+    >
+      🎁 ¡RECLAMAR MI 5% EXTRA Y COMPRAR!
+    </button>
+
+    <button
+      id="decline-discount-btn"
+      class="text-xs text-slate-400 underline hover:text-slate-200 mt-3 block mx-auto cursor-pointer"
+    >
+      No gracias, prefiero cerrar de todos modos
+    </button>
+  </div>
+</div>
+
+<script>
+  import {
+    isExitModalOpen,
+    exitIntentDiscount,
+    hasExitDiscountClaimed,
+    isCheckoutModalOpen,
+  } from '../../stores/checkoutStore';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('exit-modal');
+    const closeBtn = document.getElementById('close-exit-modal-btn');
+    const claimBtn = document.getElementById('claim-discount-btn');
+    const declineBtn = document.getElementById('decline-discount-btn');
+
+    isExitModalOpen.subscribe((isOpen) => {
+      if (!modal) return;
+      if (isOpen) {
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+          modal.classList.remove('opacity-0');
+          const inner = modal.querySelector('div');
+          if (inner) inner.classList.remove('scale-95');
+        }, 10);
+      } else {
+        modal.classList.add('opacity-0');
+        setTimeout(() => {
+          modal.classList.add('hidden');
+        }, 300);
+      }
+    });
+
+    function closeExitModal() {
+      isExitModalOpen.set(false);
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', closeExitModal);
+    if (declineBtn) declineBtn.addEventListener('click', closeExitModal);
+
+    if (claimBtn) {
+      claimBtn.addEventListener('click', () => {
+        exitIntentDiscount.set(5); // Apply 5% extra discount
+        hasExitDiscountClaimed.set(true);
+        isExitModalOpen.set(false);
+        isCheckoutModalOpen.set(true); // Ensure checkout modal stays open!
+      });
+    }
+
+    // Trigger 1: Desktop mouse leave top of window if checkout modal is open
+    document.addEventListener('mouseleave', (e) => {
+      if (e.clientY <= 10 && isCheckoutModalOpen.get() && !hasExitDiscountClaimed.get()) {
+        isExitModalOpen.set(true);
+      }
+    });
+  });
+</script>

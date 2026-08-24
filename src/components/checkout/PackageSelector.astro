@@ -1,0 +1,114 @@
+<div class="w-full max-w-xl mx-auto px-4 py-6 bg-slate-900 text-white rounded-3xl shadow-2xl border border-slate-800 my-6">
+  <div class="text-center mb-6">
+    <span class="inline-block bg-amber-500/20 text-amber-400 font-extrabold text-xs tracking-wider px-3 py-1 rounded-full uppercase mb-2 border border-amber-500/30">
+      Paso 1: Selecciona tu Oferta
+    </span>
+    <h2 class="text-2xl sm:text-3xl font-black text-amber-400 tracking-tight">
+      ELIJE TU PAQUETE CON DESCUENTO
+    </h2>
+    <p class="text-xs sm:text-sm text-slate-300 mt-1">
+      Pagas únicamente al recibir tu producto en casa (Contra Entrega)
+    </p>
+  </div>
+
+  <div id="package-offers-container" class="grid grid-cols-1 gap-4">
+    <!-- Rendered dynamically via JS client script -->
+  </div>
+</div>
+
+<script>
+  import { packageOffersStore, selectedPackageId } from '../../stores/checkoutStore';
+  import type { PackageOffer } from '../../types/landing';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('package-offers-container');
+
+    function renderPackages(offers: PackageOffer[], currentSelectedId: string) {
+      if (!container) return;
+      container.innerHTML = '';
+
+      offers.forEach((pkg) => {
+        const baseTotal = pkg.originalPricePerUnit * pkg.quantity;
+        const discount = (baseTotal * pkg.discountPercentage) / 100;
+        const finalPrice = Math.round(baseTotal - discount);
+        const isSelected = pkg.id === currentSelectedId;
+
+        const card = document.createElement('div');
+        card.setAttribute('data-package-id', pkg.id);
+        card.className = `
+          package-card group relative p-5 rounded-2xl cursor-pointer border-2 transition-all duration-300
+          ${
+            isSelected
+              ? 'border-amber-400 ring-2 ring-amber-400/40 bg-slate-800/90 shadow-lg shadow-amber-500/10'
+              : pkg.isPopular
+              ? 'border-amber-400/60 bg-slate-800/80 hover:border-amber-400'
+              : pkg.isBestPrice
+              ? 'border-emerald-500/60 bg-slate-800/80 hover:border-emerald-500'
+              : 'border-slate-700 bg-slate-800/50 hover:border-slate-600'
+          }
+        `;
+
+        card.innerHTML = `
+          ${pkg.badge ? `
+            <div class="absolute -top-3.5 right-4 text-xs font-black px-3 py-0.5 rounded-full uppercase tracking-wider shadow-md text-white ${pkg.isPopular ? 'bg-amber-500' : 'bg-emerald-500'}">
+              ${pkg.badge}
+            </div>
+          ` : ''}
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <input
+                type="radio"
+                name="package_selection"
+                value="${pkg.id}"
+                ${isSelected ? 'checked' : ''}
+                class="w-5 h-5 accent-amber-500 cursor-pointer"
+              />
+              <div>
+                <h3 class="font-extrabold text-lg sm:text-xl text-white group-hover:text-amber-300 transition-colors">
+                  ${pkg.title}
+                </h3>
+                <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-300 mt-0.5">
+                  ${pkg.freeShipping ? `
+                    <span class="inline-flex items-center gap-1 text-emerald-400 font-semibold">
+                      <span>🚚</span> Envío Gratis
+                    </span>
+                  ` : ''}
+                  ${pkg.discountPercentage > 0 ? `
+                    <span class="bg-red-500/20 text-red-400 font-bold px-1.5 py-0.5 rounded">
+                      -${pkg.discountPercentage}% Ahorro
+                    </span>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+            <div class="text-right">
+              ${pkg.discountPercentage > 0 ? `
+                <div class="text-xs text-slate-400 line-through font-semibold">
+                  S/ ${baseTotal}
+                </div>
+              ` : ''}
+              <div class="text-xl sm:text-2xl font-black text-amber-400">
+                S/ ${finalPrice}
+              </div>
+            </div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          selectedPackageId.set(pkg.id);
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    // Subscribe to package store & selection changes
+    packageOffersStore.subscribe((offers) => {
+      renderPackages(offers, selectedPackageId.get());
+    });
+
+    selectedPackageId.subscribe((id) => {
+      renderPackages(packageOffersStore.get(), id);
+    });
+  });
+</script>

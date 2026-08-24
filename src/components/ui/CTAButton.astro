@@ -1,0 +1,55 @@
+---
+interface Props {
+  text?: string;
+  subtext?: string;
+  variant?: 'green' | 'pulse' | 'primary';
+  class?: string;
+}
+
+const {
+  text = '¡QUIERO HACER MI PEDIDO!',
+  subtext = '🔥 Antes de que se agoten 🔥',
+  variant = 'green',
+  class: className = '',
+} = Astro.props;
+---
+
+<div class={`w-full max-w-md mx-auto px-3 py-2 text-center ${className}`}>
+  <button
+    class={`
+      open-checkout-modal-btn
+      w-full group relative flex flex-col items-center justify-center
+      py-3.5 px-6 rounded-2xl font-black text-white shadow-xl cursor-pointer
+      transition-all duration-300 transform active:scale-95 hover:scale-[1.02]
+      ${
+        variant === 'green'
+          ? 'bg-[#00c853] hover:bg-[#00e676] text-white shadow-emerald-600/30'
+          : 'bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 shadow-emerald-500/30'
+      }
+    `}
+  >
+    <span class="text-xl sm:text-2xl font-black tracking-wide uppercase leading-tight drop-shadow">
+      {text}
+    </span>
+
+    {subtext && (
+      <span class="text-xs sm:text-sm font-bold text-amber-200 mt-0.5 flex items-center justify-center gap-1">
+        {subtext}
+      </span>
+    )}
+  </button>
+</div>
+
+<script>
+  import { isCheckoutModalOpen } from '../../stores/checkoutStore';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll('.open-checkout-modal-btn');
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        isCheckoutModalOpen.set(true);
+      });
+    });
+  });
+</script>

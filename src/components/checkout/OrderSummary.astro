@@ -1,0 +1,87 @@
+<div class="w-full bg-slate-950 p-4 sm:p-6 rounded-2xl border border-slate-800 my-4 text-slate-200">
+  <h3 class="text-sm sm:text-base font-extrabold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+    <span>📋</span> Resumen de la Orden
+  </h3>
+
+  <div class="space-y-2 text-xs sm:text-sm">
+    <div class="flex justify-between items-center text-slate-300">
+      <span>Subtotal de Producto:</span>
+      <span id="summary-subtotal" class="font-semibold text-white">S/ 0</span>
+    </div>
+
+    <div id="summary-pkg-discount-row" class="flex justify-between items-center text-emerald-400 font-medium">
+      <span>Descuento de Paquete:</span>
+      <span id="summary-pkg-discount">-S/ 0</span>
+    </div>
+
+    <div id="summary-extra-discount-row" class="hidden flex justify-between items-center text-amber-400 font-bold bg-amber-500/10 p-2 rounded-lg border border-amber-500/20">
+      <span class="flex items-center gap-1">
+        <span>🎁</span> Descuento Extra Retención (<span id="extra-discount-percent">0</span>%):
+      </span>
+      <span id="summary-extra-discount">-S/ 0</span>
+    </div>
+
+    <div class="flex justify-between items-center text-slate-300">
+      <span>Costo de Envío:</span>
+      <span id="summary-shipping" class="font-semibold text-emerald-400">¡GRATIS!</span>
+    </div>
+
+    <div class="border-t border-slate-800 pt-3 mt-2 flex justify-between items-baseline">
+      <div>
+        <span class="text-base sm:text-lg font-black text-white block">TOTAL A PAGAR:</span>
+        <span class="text-[10px] text-slate-400 font-medium">Pagas al recibir tu producto</span>
+      </div>
+      <div class="text-right">
+        <span id="summary-final-total" class="text-2xl sm:text-3xl font-black text-amber-400">
+          S/ 0
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { checkoutPricing } from '../../stores/checkoutStore';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const elSubtotal = document.getElementById('summary-subtotal');
+    const elPkgDiscount = document.getElementById('summary-pkg-discount');
+    const elPkgDiscountRow = document.getElementById('summary-pkg-discount-row');
+    const elExtraDiscountRow = document.getElementById('summary-extra-discount-row');
+    const elExtraPercent = document.getElementById('extra-discount-percent');
+    const elExtraDiscount = document.getElementById('summary-extra-discount');
+    const elShipping = document.getElementById('summary-shipping');
+    const elFinalTotal = document.getElementById('summary-final-total');
+
+    checkoutPricing.subscribe((pricing) => {
+      if (elSubtotal) elSubtotal.textContent = `S/ ${pricing.totalBasePrice}`;
+      
+      if (elPkgDiscount && elPkgDiscountRow) {
+        if (pricing.packageDiscountAmount > 0) {
+          elPkgDiscount.textContent = `-S/ ${pricing.packageDiscountAmount}`;
+          elPkgDiscountRow.classList.remove('hidden');
+        } else {
+          elPkgDiscountRow.classList.add('hidden');
+        }
+      }
+
+      if (elExtraDiscountRow && elExtraPercent && elExtraDiscount) {
+        if (pricing.extraDiscountPercentage > 0) {
+          elExtraPercent.textContent = pricing.extraDiscountPercentage.toString();
+          elExtraDiscount.textContent = `-S/ ${pricing.extraDiscountAmount}`;
+          elExtraDiscountRow.classList.remove('hidden');
+        } else {
+          elExtraDiscountRow.classList.add('hidden');
+        }
+      }
+
+      if (elShipping) {
+        elShipping.textContent = pricing.shippingCost === 0 ? '¡GRATIS!' : `S/ ${pricing.shippingCost}`;
+      }
+
+      if (elFinalTotal) {
+        elFinalTotal.textContent = `S/ ${pricing.finalPriceTotal}`;
+      }
+    });
+  });
+</script>

@@ -1,0 +1,24 @@
+---
+import type { BannerBlockData } from '../../types/landing';
+
+interface Props {
+  block: BannerBlockData;
+}
+
+const { block } = Astro.props;
+---
+
+<div class="w-full max-w-xl mx-auto my-2 relative overflow-hidden shadow-lg bg-amber-50">
+  {block.badgeText && (
+    <div class="bg-gradient-to-r from-red-600 to-amber-600 text-white text-center font-bold text-xs sm:text-sm py-1 px-4 tracking-wider uppercase shadow-md">
+      {block.badgeText}
+    </div>
+  )}
+  
+  <img
+    src={block.src}
+    alt={block.alt || 'Banner promocional'}
+    class="w-full h-auto object-cover block"
+    loading="lazy"
+  />
+</div>
