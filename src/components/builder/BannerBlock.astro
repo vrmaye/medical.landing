@@ -18,6 +18,8 @@ const { block } = Astro.props;
   <img
     src={block.src}
     alt={block.alt || 'Banner promocional'}
+    width={block.width}
+    height={block.height}
     class="w-full h-auto object-cover block"
     loading="lazy"
   />

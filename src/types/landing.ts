@@ -9,6 +9,8 @@ export interface ImageBlockData extends BaseBlock {
   type: 'image';
   src: string;
   alt?: string;
+  width: number;
+  height: number;
 }
 
 export interface BannerBlockData extends BaseBlock {
@@ -16,6 +18,8 @@ export interface BannerBlockData extends BaseBlock {
   src: string;
   alt?: string;
   badgeText?: string;
+  width: number;
+  height: number;
 }
 
 export interface ButtonBlockData extends BaseBlock {
