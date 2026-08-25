@@ -25,9 +25,6 @@ import CheckoutForm from './CheckoutForm.astro';
       <h2 class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">
         COMPLETÁ TU PEDIDO
       </h2>
-      <p class="text-xs text-slate-400">
-        Pagas únicamente al recibir tu producto en casa (Contra Entrega)
-      </p>
     </div>
 
     <!-- Package Selector -->
@@ -44,19 +41,55 @@ import CheckoutForm from './CheckoutForm.astro';
     isExitModalOpen,
     exitAttempted,
     hasExitDiscountClaimed,
+    setPackageOffers,
   } from '../../stores/checkoutStore';
+  import { getSupabaseClient } from '../../supabase/client';
+
+  async function fetchPackages() {
+    try {
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase
+        .from('packages')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+
+      if (error || !data || data.length === 0) {
+        console.warn('[Checkout] Supabase packages empty or failed, using hardcoded');
+        return;
+      }
+
+      console.log('[Checkout] Packages from Supabase:', data);
+
+      const mapped = data.map((row) => ({
+        id: row.id,
+        quantity: row.quantity,
+        title: row.title,
+        originalPricePerUnit: row.original_price_per_unit,
+        discountPercentage: row.discount_percentage,
+        badge: row.badge ?? undefined,
+        isPopular: row.is_popular,
+        isBestPrice: row.is_best_price,
+        freeShipping: row.free_shipping,
+        imageUrl: row.image_url ?? undefined,
+      }));
+
+      console.log('[Checkout] Mapped packages:', mapped);
+      setPackageOffers(mapped);
+    } catch (err) {
+      console.warn('[Checkout] Failed to fetch packages:', err);
+    }
+  }
 
   document.addEventListener('DOMContentLoaded', () => {
     const backdrop = document.getElementById('checkout-modal-backdrop');
     const closeBtn = document.getElementById('close-checkout-modal-btn');
 
     function handleCloseAttempt() {
-      // If user hasn't seen the exit discount offer yet, show exit modal ON TOP!
       if (!exitAttempted.get() && !hasExitDiscountClaimed.get()) {
         exitAttempted.set(true);
-        isExitModalOpen.set(true); // Pops up ExitIntentModal (z-60) over CheckoutModal (z-50)
+        isExitModalOpen.set(true);
       } else {
-        // If exit offer was already shown/closed or claimed, close checkout modal
         isCheckoutModalOpen.set(false);
       }
     }
@@ -66,6 +99,7 @@ import CheckoutForm from './CheckoutForm.astro';
       if (isOpen) {
         backdrop.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+        fetchPackages();
         setTimeout(() => {
           backdrop.classList.remove('opacity-0');
           const container = backdrop.firstElementChild;
@@ -84,7 +118,6 @@ import CheckoutForm from './CheckoutForm.astro';
       closeBtn.addEventListener('click', handleCloseAttempt);
     }
 
-    // Close on backdrop click (also triggers exit attempt logic)
     if (backdrop) {
       backdrop.addEventListener('click', (e) => {
         if (e.target === backdrop) {

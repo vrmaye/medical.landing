@@ -3,30 +3,80 @@ import Layout from '../layouts/Layout.astro';
 import DynamicBlockRenderer from '../components/builder/DynamicBlockRenderer.astro';
 import CheckoutModal from '../components/checkout/CheckoutModal.astro';
 import ExitIntentModal from '../components/retention/ExitIntentModal.astro';
+import { landingService } from '../services/landing.service';
 import { mockLandingConfig } from '../data/mockLandingConfig';
+import type { Database } from '../supabase/database.types';
+import type { LandingBlock } from '../types/landing';
 
-const landingBlocks = mockLandingConfig;
+type LandingBlockRow = Database['medic']['Tables']['landing_blocks']['Row'];
+
+function mapBlock(row: LandingBlockRow): LandingBlock | null {
+  switch (row.type) {
+    case 'image':
+      return {
+        id: row.id,
+        type: 'image',
+        src: row.src || '',
+        alt: row.alt || '',
+        width: 1024,
+        height: 1536,
+      };
+    case 'banner':
+      return {
+        id: row.id,
+        type: 'banner',
+        src: row.src || '',
+        alt: row.alt || '',
+        badgeText: row.badge_text || '',
+        width: 978,
+        height: 136,
+      };
+    case 'button':
+      return {
+        id: row.id,
+        type: 'button',
+        text: row.text || '¡QUIERO MI PEDIDO!',
+        subtext: row.subtext || '',
+        variant: (row.variant as 'pulse' | 'primary' | 'secondary') || 'pulse',
+      };
+    default:
+      return null;
+  }
+}
+
+let landingBlocks: LandingBlock[] = [];
+let headerText = 'OFERTA DE HOY: HASTA 40% OFF + ENVÍO GRATIS Y PAGO CONTRA ENTREGA';
+
+try {
+  const [rows, headerConfig] = await Promise.all([
+    landingService.getBlocks(true),
+    landingService.getHeaderConfig(),
+  ]);
+  landingBlocks = rows.map(mapBlock).filter(Boolean) as LandingBlock[];
+  if (headerConfig?.text) {
+    headerText = headerConfig.text;
+  }
+} catch (e) {
+  console.warn('[index] Supabase failed, falling back to mock:', e);
+  landingBlocks = mockLandingConfig;
+}
 ---
 
 <Layout title="Spray de Propóleo Natural | Promoción Exclusiva Contra Entrega">
-  <!-- Top Announcement Bar (Relative flow so it never overlaps or covers content when scrolling) -->
+  <!-- Top Announcement Bar -->
   <div class="w-full relative bg-gradient-to-r from-red-600 via-amber-600 to-red-600 text-white text-center py-2.5 px-3 text-xs sm:text-sm font-extrabold shadow-md flex items-center justify-center gap-2 uppercase tracking-wide">
     <span class="animate-pulse">🔥</span>
-    <span>OFERTA DE HOY: HASTA 40% OFF + ENVÍO GRATIS Y PAGO CONTRA ENTREGA</span>
+    <span>{headerText}</span>
   </div>
 
   <main class="w-full max-w-xl mx-auto flex flex-col items-center pb-28">
-    <!-- Dynamic Block Renderer (Renders exact JSON block sequence) -->
     <DynamicBlockRenderer blocks={landingBlocks} />
   </main>
 
-  <!-- Checkout Dialog/Modal -->
   <CheckoutModal />
-
-  <!-- Exit Intent Retention Modal -->
   <ExitIntentModal />
 
-  <!-- ALWAYS ANCHORED STICKY BOTTOM BUTTON (Fijo en la parte inferior siempre) -->
+  <!-- Sticky Bottom CTA -->
   <div class="fixed bottom-0 inset-x-0 z-40 p-2 sm:p-3 bg-slate-950/95 backdrop-blur-md border-t border-slate-800/80 shadow-2xl flex justify-center">
     <div class="w-full max-w-xl px-2">
       <button

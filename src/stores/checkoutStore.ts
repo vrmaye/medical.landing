@@ -49,9 +49,9 @@ export const checkoutPricing = computed([selectedPackage, exitIntentDiscount], (
 
   // Extra exit-intent discount if claimed
   const extraDiscountAmount = (priceAfterPackageDiscount * extraDiscount) / 100;
-  const finalPrice = Math.round(priceAfterPackageDiscount - extraDiscountAmount);
+  const finalPrice = priceAfterPackageDiscount - extraDiscountAmount;
 
-  const totalSaved = Math.round(totalBasePrice - finalPrice);
+  const totalSaved = totalBasePrice - finalPrice;
   const shippingCost = pkg.freeShipping ? 0 : 15; // Base shipping fee if not free
 
   return {

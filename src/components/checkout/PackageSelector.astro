@@ -7,7 +7,7 @@
       ELIJE TU PAQUETE CON DESCUENTO
     </h2>
     <p class="text-xs sm:text-sm text-slate-300 mt-1">
-      Pagas únicamente al recibir tu producto en casa (Contra Entrega)
+      Selecciona la cantidad de frascos que deseas
     </p>
   </div>
 
@@ -30,7 +30,7 @@
       offers.forEach((pkg) => {
         const baseTotal = pkg.originalPricePerUnit * pkg.quantity;
         const discount = (baseTotal * pkg.discountPercentage) / 100;
-        const finalPrice = Math.round(baseTotal - discount);
+        const finalPrice = baseTotal - discount;
         const isSelected = pkg.id === currentSelectedId;
 
         const card = document.createElement('div');
@@ -63,6 +63,9 @@
                 ${isSelected ? 'checked' : ''}
                 class="w-5 h-5 accent-amber-500 cursor-pointer"
               />
+              ${pkg.imageUrl ? `
+                <img src="${pkg.imageUrl}" alt="${pkg.title}" class="w-16 h-16 object-cover rounded-xl shadow-md" />
+              ` : ''}
               <div>
                 <h3 class="font-extrabold text-lg sm:text-xl text-white group-hover:text-amber-300 transition-colors">
                   ${pkg.title}
@@ -81,14 +84,14 @@
                 </div>
               </div>
             </div>
-            <div class="text-right">
+            <div class="text-right whitespace-nowrap flex-shrink-0">
               ${pkg.discountPercentage > 0 ? `
                 <div class="text-xs text-slate-400 line-through font-semibold">
-                  S/ ${baseTotal}
+                  S/ ${baseTotal.toFixed(2)}
                 </div>
               ` : ''}
               <div class="text-xl sm:text-2xl font-black text-amber-400">
-                S/ ${finalPrice}
+                S/ ${finalPrice.toFixed(2)}
               </div>
             </div>
           </div>

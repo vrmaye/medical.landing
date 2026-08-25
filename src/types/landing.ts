@@ -42,6 +42,7 @@ export interface PackageOffer {
   originalPricePerUnit: number;
   discountPercentage: number;
   freeShipping: boolean;
+  imageUrl?: string;
 }
 
 export interface CustomerFormData {

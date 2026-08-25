@@ -132,6 +132,7 @@ import { PERU_LOCATIONS, DEPARTMENTS } from '../../data/peruLocations';
   import { checkoutPricing, selectedPackage } from '../../stores/checkoutStore';
   import { storeConfig } from '../../data/config';
   import { PERU_LOCATIONS } from '../../data/peruLocations';
+  import { getSupabaseClient } from '../../supabase/client';
 
   document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('checkout-form') as HTMLFormElement;
@@ -179,50 +180,61 @@ import { PERU_LOCATIONS, DEPARTMENTS } from '../../data/peruLocations';
       const currentPkg = selectedPackage.get();
       const pricing = checkoutPricing.get();
 
-      const leadPayload = {
-        fullName,
-        phone,
-        department,
-        district,
-        address,
-        reference,
-        packageId: currentPkg.id,
-        packageTitle: currentPkg.title,
-        quantity: currentPkg.quantity,
-        totalBasePrice: pricing.totalBasePrice,
-        packageDiscountAmount: pricing.packageDiscountAmount,
-        extraDiscountPercentage: pricing.extraDiscountPercentage,
-        extraDiscountAmount: pricing.extraDiscountAmount,
-        finalPriceTotal: pricing.finalPriceTotal,
-        shippingCost: pricing.shippingCost,
-        status: 'NUEVO',
-        createdAt: new Date().toISOString(),
-      };
+      const leadId = `LEAD-${Date.now()}`;
 
+      // 1. Save lead to Supabase
       let targetWhatsappNumber = storeConfig.whatsappNumber;
 
       try {
-        // 1. Send Lead payload to Backend API
-        const response = await fetch(storeConfig.apiOrderEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(leadPayload),
+        const supabase = getSupabaseClient();
+        const { error } = await supabase.from('leads').insert({
+          id: leadId,
+          full_name: fullName,
+          phone,
+          department,
+          district,
+          address,
+          reference: reference || null,
+          package_title: currentPkg.title,
+          quantity: currentPkg.quantity,
+          unit_price: pricing.totalBasePrice / currentPkg.quantity,
+          total_base_price: pricing.totalBasePrice,
+          discount_amount: pricing.packageDiscountAmount,
+          extra_exit_discount_amount: pricing.extraDiscountAmount,
+          final_price_total: pricing.finalPriceTotal,
+          shipping_cost: pricing.shippingCost,
+          status: 'NUEVO',
         });
 
-        if (response.ok) {
-          const apiResult = await response.json();
-          if (apiResult.whatsappNumber) {
-            targetWhatsappNumber = apiResult.whatsappNumber;
-          }
+        if (error) {
+          console.error('[Checkout] Error saving lead to Supabase:', error.message);
+        } else {
+          console.log('[Checkout] Lead saved:', leadId);
         }
       } catch (err) {
-        console.warn('[Checkout] Fallback enviando orden por error en API:', err);
+        console.warn('[Checkout] Supabase insert failed:', err);
       }
 
-      // 2. Format WhatsApp order summary message
+      // 2. Get global config for WhatsApp number
+      try {
+        const supabase = getSupabaseClient();
+        const { data } = await supabase
+          .from('system_settings')
+          .select('value')
+          .eq('key', 'landing_global_config')
+          .maybeSingle();
+
+        if (data?.value && typeof data.value === 'object' && 'whatsappNumber' in data.value) {
+          targetWhatsappNumber = (data.value as { whatsappNumber: string }).whatsappNumber;
+        }
+      } catch (err) {
+        console.warn('[Checkout] Failed to fetch WhatsApp config:', err);
+      }
+
+      // 3. Format WhatsApp message
       let extraDiscountLine = '';
       if (pricing.extraDiscountPercentage > 0) {
-        extraDiscountLine = `🎁 *Descuento Extra Retención:* -${pricing.extraDiscountPercentage}% (-S/ ${pricing.extraDiscountAmount})\n`;
+        extraDiscountLine = `🎁 *Descuento Extra Retención:* -${pricing.extraDiscountPercentage}% (-S/ ${pricing.extraDiscountAmount.toFixed(2)})\n`;
       }
 
       const waMessage =
@@ -234,11 +246,11 @@ import { PERU_LOCATIONS, DEPARTMENTS } from '../../data/peruLocations';
         `🏠 *Dirección:* ${address}\n` +
         `🏷️ *Referencia:* ${reference || 'N/A'}\n\n` +
         extraDiscountLine +
-        `💰 *TOTAL A PAGAR:* S/ ${pricing.finalPriceTotal} (Pago Contra Entrega)\n` +
-        `🚚 *Envío:* ${pricing.shippingCost === 0 ? '¡GRATIS!' : 'S/ ' + pricing.shippingCost}\n\n` +
+        `💰 *TOTAL A PAGAR:* S/ ${pricing.finalPriceTotal.toFixed(2)} (Pago Contra Entrega)\n` +
+        `🚚 *Envío:* ${pricing.shippingCost === 0 ? '¡GRATIS!' : 'S/ ' + pricing.shippingCost.toFixed(2)}\n\n` +
         `Quedo a la espera de la confirmación para el envío. ¡Muchas gracias!`;
 
-      // 3. Open WhatsApp link to seller number returned by API
+      // 4. Open WhatsApp
       const cleanPhone = targetWhatsappNumber.replace(/\D/g, '');
       const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`;
 

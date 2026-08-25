@@ -54,11 +54,11 @@
     const elFinalTotal = document.getElementById('summary-final-total');
 
     checkoutPricing.subscribe((pricing) => {
-      if (elSubtotal) elSubtotal.textContent = `S/ ${pricing.totalBasePrice}`;
+      if (elSubtotal) elSubtotal.textContent = `S/ ${pricing.totalBasePrice.toFixed(2)}`;
       
       if (elPkgDiscount && elPkgDiscountRow) {
         if (pricing.packageDiscountAmount > 0) {
-          elPkgDiscount.textContent = `-S/ ${pricing.packageDiscountAmount}`;
+          elPkgDiscount.textContent = `-S/ ${pricing.packageDiscountAmount.toFixed(2)}`;
           elPkgDiscountRow.classList.remove('hidden');
         } else {
           elPkgDiscountRow.classList.add('hidden');
@@ -68,7 +68,7 @@
       if (elExtraDiscountRow && elExtraPercent && elExtraDiscount) {
         if (pricing.extraDiscountPercentage > 0) {
           elExtraPercent.textContent = pricing.extraDiscountPercentage.toString();
-          elExtraDiscount.textContent = `-S/ ${pricing.extraDiscountAmount}`;
+          elExtraDiscount.textContent = `-S/ ${pricing.extraDiscountAmount.toFixed(2)}`;
           elExtraDiscountRow.classList.remove('hidden');
         } else {
           elExtraDiscountRow.classList.add('hidden');
@@ -76,11 +76,11 @@
       }
 
       if (elShipping) {
-        elShipping.textContent = pricing.shippingCost === 0 ? '¡GRATIS!' : `S/ ${pricing.shippingCost}`;
+        elShipping.textContent = pricing.shippingCost === 0 ? '¡GRATIS!' : `S/ ${pricing.shippingCost.toFixed(2)}`;
       }
 
       if (elFinalTotal) {
-        elFinalTotal.textContent = `S/ ${pricing.finalPriceTotal}`;
+        elFinalTotal.textContent = `S/ ${pricing.finalPriceTotal.toFixed(2)}`;
       }
     });
   });

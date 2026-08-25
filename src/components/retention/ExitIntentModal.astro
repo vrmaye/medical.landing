@@ -89,18 +89,11 @@
 
     if (claimBtn) {
       claimBtn.addEventListener('click', () => {
-        exitIntentDiscount.set(5); // Apply 5% extra discount
+        exitIntentDiscount.set(5);
         hasExitDiscountClaimed.set(true);
         isExitModalOpen.set(false);
-        isCheckoutModalOpen.set(true); // Ensure checkout modal stays open!
+        isCheckoutModalOpen.set(true);
       });
     }
-
-    // Trigger 1: Desktop mouse leave top of window if checkout modal is open
-    document.addEventListener('mouseleave', (e) => {
-      if (e.clientY <= 10 && isCheckoutModalOpen.get() && !hasExitDiscountClaimed.get()) {
-        isExitModalOpen.set(true);
-      }
-    });
   });
 </script>
