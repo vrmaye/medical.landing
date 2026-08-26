@@ -1,17 +1,14 @@
-<div class="w-full max-w-xl mx-auto px-4 py-6 bg-slate-900 text-white rounded-3xl shadow-2xl border border-slate-800 my-6">
-  <div class="text-center mb-6">
-    <span class="inline-block bg-amber-500/20 text-amber-400 font-extrabold text-xs tracking-wider px-3 py-1 rounded-full uppercase mb-2 border border-amber-500/30">
+<div class="w-full max-w-xl mx-auto px-2 py-3 bg-slate-900 text-white rounded-2xl shadow-2xl border border-slate-800 my-3">
+  <div class="text-center mb-3">
+    <span class="inline-block bg-amber-500/20 text-amber-400 font-extrabold text-[10px] tracking-wider px-2 py-0.5 rounded-full uppercase mb-1 border border-amber-500/30">
       Paso 1: Selecciona tu Oferta
     </span>
-    <h2 class="text-2xl sm:text-3xl font-black text-amber-400 tracking-tight">
-      ELIJE TU PAQUETE CON DESCUENTO
+    <h2 class="text-lg sm:text-2xl font-black text-amber-400 tracking-tight">
+      ELIJE TU PAQUETE
     </h2>
-    <p class="text-xs sm:text-sm text-slate-300 mt-1">
-      Selecciona la cantidad de frascos que deseas
-    </p>
   </div>
 
-  <div id="package-offers-container" class="grid grid-cols-1 gap-4">
+  <div id="package-offers-container" class="grid grid-cols-1 gap-2">
     <!-- Rendered dynamically via JS client script -->
   </div>
 </div>
@@ -55,7 +52,7 @@
         const card = document.createElement('div');
         card.setAttribute('data-package-id', pkg.id);
         card.className = `
-          package-card group relative p-5 rounded-2xl cursor-pointer border-2 transition-all duration-300
+          package-card group relative p-2.5 rounded-xl cursor-pointer border-2 transition-all duration-300
           ${
             isSelected
               ? 'border-amber-400 ring-2 ring-amber-400/40 bg-slate-800/90 shadow-lg shadow-amber-500/10'
@@ -69,47 +66,45 @@
 
         card.innerHTML = `
           ${pkg.badge ? `
-            <div class="absolute -top-3.5 right-4 text-xs font-black px-3 py-0.5 rounded-full uppercase tracking-wider shadow-md text-white ${pkg.isPopular ? 'bg-amber-500' : 'bg-emerald-500'}">
+            <div class="absolute -top-2 right-2 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md text-white ${pkg.isPopular ? 'bg-amber-500' : 'bg-emerald-500'}">
               ${pkg.badge}
             </div>
           ` : ''}
-          <div class="flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-              <input
-                type="radio"
-                name="package_selection"
-                value="${pkg.id}"
-                ${isSelected ? 'checked' : ''}
-                class="w-5 h-5 accent-amber-500 cursor-pointer"
-              />
-              ${pkg.imageUrl ? `
-                <img src="${pkg.imageUrl}" alt="${pkg.title}" class="w-16 h-16 object-cover rounded-xl shadow-md" />
-              ` : ''}
-              <div>
-                <h3 class="font-extrabold text-lg sm:text-xl text-white group-hover:text-amber-300 transition-colors">
-                  ${pkg.title}
-                </h3>
-                <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-300 mt-0.5">
-                  ${pkg.freeShipping ? `
-                    <span class="inline-flex items-center gap-1 text-emerald-400 font-semibold">
-                      <span>🚚</span> Envío Gratis
-                    </span>
-                  ` : ''}
-                  ${pkg.discountPercentage > 0 ? `
-                    <span class="bg-red-500/20 text-red-400 font-bold px-1.5 py-0.5 rounded">
-                      -${pkg.discountPercentage}% Ahorro
-                    </span>
-                  ` : ''}
-                </div>
+          <div class="flex items-center gap-2">
+            <input
+              type="radio"
+              name="package_selection"
+              value="${pkg.id}"
+              ${isSelected ? 'checked' : ''}
+              class="w-4 h-4 accent-amber-500 cursor-pointer flex-shrink-0"
+            />
+            ${pkg.imageUrl ? `
+              <img src="${pkg.imageUrl}" alt="${pkg.title}" class="w-11 h-11 sm:w-12 sm:h-12 object-cover rounded-lg shadow-md flex-shrink-0" />
+            ` : ''}
+            <div class="flex-1 min-w-0">
+              <h3 class="font-extrabold text-[13px] sm:text-sm text-white group-hover:text-amber-300 transition-colors leading-tight">
+                ${pkg.title}
+              </h3>
+              <div class="flex items-center gap-1 text-[10px] sm:text-xs text-slate-300 mt-0.5">
+                ${pkg.freeShipping ? `
+                  <span class="inline-flex items-center gap-0.5 text-emerald-400 font-semibold">
+                    <span>🚚</span> Envío Gratis
+                  </span>
+                ` : ''}
+                ${pkg.discountPercentage > 0 ? `
+                  <span class="bg-red-500/20 text-red-400 font-bold px-1 py-0.5 rounded">
+                    -${pkg.discountPercentage}%
+                  </span>
+                ` : ''}
               </div>
             </div>
             <div class="text-right whitespace-nowrap flex-shrink-0">
               ${pkg.discountPercentage > 0 ? `
-                <div class="text-xs text-slate-400 line-through font-semibold">
+                <div class="text-[10px] text-slate-400 line-through font-semibold">
                   S/ ${baseTotal.toFixed(2)}
                 </div>
               ` : ''}
-              <div class="text-xl sm:text-2xl font-black text-amber-400">
+              <div class="text-sm sm:text-base font-black text-amber-400">
                 S/ ${finalPrice.toFixed(2)}
               </div>
             </div>

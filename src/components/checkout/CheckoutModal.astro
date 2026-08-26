@@ -5,24 +5,24 @@ import CheckoutForm from './CheckoutForm.astro';
 
 <div
   id="checkout-modal-backdrop"
-  class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-2 sm:p-4 overflow-y-auto hidden opacity-0 transition-opacity duration-300"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-1 sm:p-3 overflow-y-auto hidden opacity-0 transition-opacity duration-300"
 >
-  <div class="relative w-full max-w-xl max-h-[92vh] overflow-y-auto bg-slate-900 border border-amber-500/40 rounded-3xl p-4 sm:p-6 shadow-2xl text-white transform scale-95 transition-transform duration-300 my-auto">
+  <div class="relative w-full max-w-xl max-h-[95vh] overflow-y-auto bg-slate-900 border border-amber-500/40 rounded-2xl p-3 sm:p-5 shadow-2xl text-white transform scale-95 transition-transform duration-300 my-auto">
     <!-- Close Button -->
     <button
       id="close-checkout-modal-btn"
-      class="absolute top-4 right-4 z-10 text-slate-400 hover:text-white text-xl font-bold w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center cursor-pointer transition active:scale-90"
+      class="absolute top-3 right-3 z-10 text-slate-400 hover:text-white text-lg font-bold w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center cursor-pointer transition active:scale-90"
       aria-label="Cerrar modal de compra"
     >
       ✕
     </button>
 
     <!-- Modal Header -->
-    <div class="text-center pt-2 pb-4 border-b border-slate-800 mb-4">
-      <span class="inline-block bg-amber-500/20 text-amber-400 font-extrabold text-xs tracking-wider px-3 py-1 rounded-full uppercase mb-1 border border-amber-500/30">
+    <div class="text-center pt-1 pb-3 border-b border-slate-800 mb-3">
+      <span class="inline-block bg-amber-500/20 text-amber-400 font-extrabold text-[10px] tracking-wider px-2 py-0.5 rounded-full uppercase mb-1 border border-amber-500/30">
         🛒 Proceso de Pedido Seguro
       </span>
-      <h2 class="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">
+      <h2 class="text-lg sm:text-xl font-black text-white uppercase tracking-tight">
         COMPLETÁ TU PEDIDO
       </h2>
     </div>

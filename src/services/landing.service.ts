@@ -7,6 +7,7 @@ export interface GlobalLandingConfig {
   whatsappNumber: string;
   shippingCost: number;
   currency: string;
+  exitIntentDiscountPercentage: number;
 }
 
 export interface HeaderConfig {
