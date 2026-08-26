@@ -259,7 +259,11 @@ import { PERU_LOCATIONS, DEPARTMENTS } from '../../data/peruLocations';
         submitText.textContent = 'REALIZAR PEDIDO';
       }
 
-      window.open(waUrl, '_blank');
+      if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        window.location.href = waUrl;
+      } else {
+        window.open(waUrl, '_blank');
+      }
     });
   });
 </script>
