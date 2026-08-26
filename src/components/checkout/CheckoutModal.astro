@@ -42,10 +42,12 @@ import CheckoutForm from './CheckoutForm.astro';
     exitAttempted,
     hasExitDiscountClaimed,
     setPackageOffers,
+    setPackagesLoading,
   } from '../../stores/checkoutStore';
   import { getSupabaseClient } from '../../supabase/client';
 
   async function fetchPackages() {
+    setPackagesLoading(true);
     try {
       const supabase = getSupabaseClient();
       const { data, error } = await supabase
@@ -55,7 +57,8 @@ import CheckoutForm from './CheckoutForm.astro';
         .order('sort_order', { ascending: true });
 
       if (error || !data || data.length === 0) {
-        console.warn('[Checkout] Supabase packages empty or failed, using hardcoded');
+        console.warn('[Checkout] Supabase packages empty or failed');
+        setPackagesLoading(false);
         return;
       }
 

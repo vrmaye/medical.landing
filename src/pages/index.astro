@@ -4,7 +4,6 @@ import DynamicBlockRenderer from '../components/builder/DynamicBlockRenderer.ast
 import CheckoutModal from '../components/checkout/CheckoutModal.astro';
 import ExitIntentModal from '../components/retention/ExitIntentModal.astro';
 import { landingService } from '../services/landing.service';
-import { mockLandingConfig } from '../data/mockLandingConfig';
 import type { Database } from '../supabase/database.types';
 import type { LandingBlock } from '../types/landing';
 
@@ -57,20 +56,22 @@ try {
     headerText = headerConfig.text;
   }
 } catch (e) {
-  console.warn('[index] Supabase failed, falling back to mock:', e);
-  landingBlocks = mockLandingConfig;
+  console.warn('[index] Supabase failed:', e);
+  landingBlocks = [];
 }
 ---
 
 <Layout title="Spray de Propóleo Natural | Promoción Exclusiva Contra Entrega">
   <!-- Top Announcement Bar -->
-  <div class="w-full relative bg-gradient-to-r from-red-600 via-amber-600 to-red-600 text-white text-center py-2.5 px-3 text-xs sm:text-sm font-extrabold shadow-md flex items-center justify-center gap-2 uppercase tracking-wide">
+  <div id="announcement-bar" class="w-full relative bg-gradient-to-r from-red-600 via-amber-600 to-red-600 text-white text-center py-2.5 px-3 text-xs sm:text-sm font-extrabold shadow-md flex items-center justify-center gap-2 uppercase tracking-wide">
     <span class="animate-pulse">🔥</span>
     <span>{headerText}</span>
   </div>
 
   <main class="w-full max-w-xl mx-auto flex flex-col items-center pb-28">
-    <DynamicBlockRenderer blocks={landingBlocks} />
+    <div id="landing-blocks">
+      <DynamicBlockRenderer blocks={landingBlocks} />
+    </div>
   </main>
 
   <CheckoutModal />
@@ -95,6 +96,54 @@ try {
 
   <script>
     import { isCheckoutModalOpen } from '../stores/checkoutStore';
+    import { getSupabaseClient } from '../supabase/client';
+
+    function renderBlockHTML(block: any): string {
+      switch (block.type) {
+        case 'image':
+          return `<div class="w-full max-w-xl mx-auto flex justify-center bg-slate-950">
+            <img src="${block.src}" alt="${block.alt || ''}" width="${block.width || 1024}" height="${block.height || 1536}" class="w-full h-auto object-cover block" loading="lazy" />
+          </div>`;
+        case 'banner':
+          return `<div class="w-full max-w-xl mx-auto my-2 relative overflow-hidden shadow-lg bg-amber-50">
+            ${block.badgeText ? `<div class="bg-gradient-to-r from-red-600 to-amber-600 text-white text-center font-bold text-xs sm:text-sm py-1 px-4 tracking-wider uppercase shadow-md">${block.badgeText}</div>` : ''}
+            <img src="${block.src}" alt="${block.alt || ''}" width="${block.width || 978}" height="${block.height || 136}" class="w-full h-auto object-cover block" loading="lazy" />
+          </div>`;
+        case 'button':
+          return `<div class="w-full max-w-xl mx-auto flex justify-center my-3">
+            <button onclick="document.dispatchEvent(new CustomEvent('open-checkout'))" class="w-full group relative flex flex-col items-center justify-center py-3.5 px-4 rounded-2xl bg-[#00c853] hover:bg-[#00e676] text-white font-black shadow-lg shadow-emerald-600/40 cursor-pointer active:scale-95 transition-all duration-200">
+              <span class="text-xl sm:text-2xl font-black tracking-wide uppercase leading-tight drop-shadow">${block.text || '¡QUIERO MI PEDIDO!'}</span>
+              ${block.subtext ? `<span class="text-xs sm:text-sm font-bold text-amber-200 mt-0.5">${block.subtext}</span>` : ''}
+            </button>
+          </div>`;
+        default:
+          return '';
+      }
+    }
+
+    async function refreshLanding() {
+      try {
+        const supabase = getSupabaseClient();
+        const [blocksRes, headerRes] = await Promise.all([
+          supabase.from('landing_blocks').select('*').eq('is_active', true).order('sort_order', { ascending: true }),
+          supabase.from('system_settings' as any).select('value').eq('key', 'landing_header_config').maybeSingle(),
+        ]);
+
+        if (blocksRes.data && blocksRes.data.length > 0) {
+          const html = blocksRes.data.map(renderBlockHTML).join('');
+          const container = document.getElementById('landing-blocks');
+          if (container) container.innerHTML = html;
+        }
+
+        if (headerRes.data?.value && typeof headerRes.data.value === 'object' && 'text' in headerRes.data.value) {
+          const bar = document.getElementById('announcement-bar');
+          const span = bar?.querySelector('span:last-child');
+          if (span) span.textContent = (headerRes.data.value as any).text;
+        }
+      } catch (e) {
+        console.warn('[Landing] Client refresh failed:', e);
+      }
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
       const anchoredBtn = document.getElementById('anchored-sticky-cta');
@@ -103,6 +152,12 @@ try {
           isCheckoutModalOpen.set(true);
         });
       }
+
+      document.addEventListener('open-checkout', () => {
+        isCheckoutModalOpen.set(true);
+      });
+
+      refreshLanding();
     });
   </script>
 </Layout>
