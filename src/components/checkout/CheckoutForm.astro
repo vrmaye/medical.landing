@@ -37,14 +37,21 @@ import { PERU_LOCATIONS, DEPARTMENTS } from '../../data/peruLocations';
       <label for="phone" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
         WhatsApp / Teléfono de Contacto *
       </label>
-      <input
-        type="tel"
-        id="phone"
-        name="phone"
-        required
-        placeholder="Ej: 987 654 321"
-        class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition"
-      />
+      <div class="flex items-center gap-0">
+        <span class="flex-shrink-0 px-3 py-3 bg-slate-800 border border-r-0 border-slate-700 rounded-l-xl text-sm font-bold text-amber-400">
+          +51
+        </span>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          required
+          maxlength="9"
+          pattern="[0-9]{9}"
+          placeholder="987654321"
+          class="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-r-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition"
+        />
+      </div>
     </div>
 
     <!-- Departamento & Distrito (Selects dinámicos con Perú Locations) -->
@@ -171,7 +178,8 @@ import { PERU_LOCATIONS, DEPARTMENTS } from '../../data/peruLocations';
 
       const formData = new FormData(form);
       const fullName = formData.get('fullName')?.toString() || '';
-      const phone = formData.get('phone')?.toString() || '';
+      const phoneRaw = formData.get('phone')?.toString() || '';
+      const phone = `+51${phoneRaw}`;
       const department = formData.get('department')?.toString() || '';
       const district = formData.get('district')?.toString() || '';
       const address = formData.get('address')?.toString() || '';
