@@ -100,22 +100,23 @@ try {
 
     let firstImageRendered = false;
 
-    function renderBlockHTML(block: any, isFirst = false): string {
+    function renderBlockHTML(block: any): string {
+      const bid = block.id || '';
       switch (block.type) {
         case 'image': {
           const isLCP = !firstImageRendered;
           if (isLCP) firstImageRendered = true;
-          return `<div class="w-full max-w-xl mx-auto flex justify-center bg-slate-950">
+          return `<div data-bid="${bid}" class="w-full max-w-xl mx-auto flex justify-center bg-slate-950">
             <img src="${block.src}" alt="${block.alt || ''}" width="${block.width || 1024}" height="${block.height || 1536}" sizes="(max-width: 768px) 100vw, 640px" class="w-full h-auto object-cover block" ${isLCP ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"'} />
           </div>`;
         }
         case 'banner':
-          return `<div class="w-full max-w-xl mx-auto my-2 relative overflow-hidden shadow-lg bg-amber-50">
+          return `<div data-bid="${bid}" class="w-full max-w-xl mx-auto my-2 relative overflow-hidden shadow-lg bg-amber-50">
             ${block.badgeText ? `<div class="bg-gradient-to-r from-red-600 to-amber-600 text-white text-center font-bold text-xs sm:text-sm py-1 px-4 tracking-wider uppercase shadow-md">${block.badgeText}</div>` : ''}
             <img src="${block.src}" alt="${block.alt || ''}" width="${block.width || 978}" height="${block.height || 136}" sizes="(max-width: 768px) 100vw, 640px" class="w-full h-auto object-cover block" loading="lazy" />
           </div>`;
         case 'button':
-          return `<div class="w-full max-w-xl mx-auto flex justify-center my-3">
+          return `<div data-bid="${bid}" class="w-full max-w-xl mx-auto flex justify-center my-3">
             <button onclick="document.dispatchEvent(new CustomEvent('open-checkout'))" class="w-full group relative flex flex-col items-center justify-center py-3.5 px-4 rounded-2xl bg-[#00c853] hover:bg-[#00e676] text-white font-black shadow-lg shadow-emerald-600/40 cursor-pointer active:scale-95 transition-all duration-200">
               <span class="text-xl sm:text-2xl font-black tracking-wide uppercase leading-tight drop-shadow">${block.text || '¡QUIERO MI PEDIDO!'}</span>
               ${block.subtext ? `<span class="text-xs sm:text-sm font-bold text-amber-200 mt-0.5">${block.subtext}</span>` : ''}
@@ -135,10 +136,19 @@ try {
         ]);
 
         if (blocksRes.data && blocksRes.data.length > 0) {
+          const container = document.getElementById('landing-blocks');
+          if (!container) return;
+
+          const firstBlock = container.querySelector('[data-bid]');
+          const newFirstId = blocksRes.data[0]?.id;
+
+          if (firstBlock && firstBlock.getAttribute('data-bid') === newFirstId) {
+            return;
+          }
+
           firstImageRendered = false;
           const html = blocksRes.data.map((b: any) => renderBlockHTML(b)).join('');
-          const container = document.getElementById('landing-blocks');
-          if (container) container.innerHTML = html;
+          container.innerHTML = html;
         }
 
         if (headerRes.data?.value && typeof headerRes.data.value === 'object' && 'text' in headerRes.data.value) {
