@@ -69,7 +69,7 @@ try {
   </div>
 
   <main class="w-full max-w-xl mx-auto flex flex-col items-center pb-28">
-    <div id="landing-blocks">
+    <div id="landing-blocks" class="min-h-[600px]">
       <DynamicBlockRenderer blocks={landingBlocks} />
     </div>
   </main>
@@ -98,16 +98,21 @@ try {
     import { isCheckoutModalOpen } from '../stores/checkoutStore';
     import { getSupabaseClient } from '../supabase/client';
 
-    function renderBlockHTML(block: any): string {
+    let firstImageRendered = false;
+
+    function renderBlockHTML(block: any, isFirst = false): string {
       switch (block.type) {
-        case 'image':
+        case 'image': {
+          const isLCP = !firstImageRendered;
+          if (isLCP) firstImageRendered = true;
           return `<div class="w-full max-w-xl mx-auto flex justify-center bg-slate-950">
-            <img src="${block.src}" alt="${block.alt || ''}" width="${block.width || 1024}" height="${block.height || 1536}" class="w-full h-auto object-cover block" loading="lazy" />
+            <img src="${block.src}" alt="${block.alt || ''}" width="${block.width || 1024}" height="${block.height || 1536}" sizes="(max-width: 768px) 100vw, 640px" class="w-full h-auto object-cover block" ${isLCP ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"'} />
           </div>`;
+        }
         case 'banner':
           return `<div class="w-full max-w-xl mx-auto my-2 relative overflow-hidden shadow-lg bg-amber-50">
             ${block.badgeText ? `<div class="bg-gradient-to-r from-red-600 to-amber-600 text-white text-center font-bold text-xs sm:text-sm py-1 px-4 tracking-wider uppercase shadow-md">${block.badgeText}</div>` : ''}
-            <img src="${block.src}" alt="${block.alt || ''}" width="${block.width || 978}" height="${block.height || 136}" class="w-full h-auto object-cover block" loading="lazy" />
+            <img src="${block.src}" alt="${block.alt || ''}" width="${block.width || 978}" height="${block.height || 136}" sizes="(max-width: 768px) 100vw, 640px" class="w-full h-auto object-cover block" loading="lazy" />
           </div>`;
         case 'button':
           return `<div class="w-full max-w-xl mx-auto flex justify-center my-3">
@@ -130,7 +135,8 @@ try {
         ]);
 
         if (blocksRes.data && blocksRes.data.length > 0) {
-          const html = blocksRes.data.map(renderBlockHTML).join('');
+          firstImageRendered = false;
+          const html = blocksRes.data.map((b: any) => renderBlockHTML(b)).join('');
           const container = document.getElementById('landing-blocks');
           if (container) container.innerHTML = html;
         }

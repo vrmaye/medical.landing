@@ -61,7 +61,8 @@ const ogImageURL = new URL(image, Astro.site || Astro.url).href;
     <link rel="dns-prefetch" href="https://api.whatsapp.com" />
 
     <!-- Google Fonts with font-display=swap -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
 
     <!-- Preload First Hero Image for Ultra-fast LCP -->
     <link rel="preload" as="image" href="/defaults/01.jpeg" fetchpriority="high" />

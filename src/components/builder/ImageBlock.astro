@@ -10,14 +10,15 @@ const { block, isFirst = false } = Astro.props;
 ---
 
 <div class="w-full max-w-xl mx-auto flex justify-center bg-slate-950">
-  <img
-    src={block.src}
-    alt={block.alt || 'Imagen promocional'}
-    width={block.width}
-    height={block.height}
-    class="w-full h-auto object-cover block"
-    loading={isFirst ? 'eager' : 'lazy'}
-    fetchpriority={isFirst ? 'high' : 'auto'}
-    decoding={isFirst ? 'sync' : 'async'}
-  />
+    <img
+      src={block.src}
+      alt={block.alt || 'Imagen promocional'}
+      width={block.width}
+      height={block.height}
+      sizes="(max-width: 768px) 100vw, 640px"
+      class="w-full h-auto object-cover block"
+      loading={isFirst ? 'eager' : 'lazy'}
+      fetchpriority={isFirst ? 'high' : 'auto'}
+      decoding={isFirst ? 'sync' : 'async'}
+    />
 </div>

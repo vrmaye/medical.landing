@@ -20,6 +20,7 @@ const { block } = Astro.props;
     alt={block.alt || 'Banner promocional'}
     width={block.width}
     height={block.height}
+    sizes="(max-width: 768px) 100vw, 640px"
     class="w-full h-auto object-cover block"
     loading="lazy"
   />
