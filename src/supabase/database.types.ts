@@ -9,10 +9,12 @@ export interface Database {
           id: string;
           full_name: string;
           phone: string;
+          dni: string | null;
           department: string;
           district: string;
           address: string;
           reference: string | null;
+          package_id: string | null;
           package_title: string;
           quantity: number;
           unit_price: number;
@@ -30,10 +32,12 @@ export interface Database {
           id?: string;
           full_name: string;
           phone: string;
+          dni?: string | null;
           department: string;
           district: string;
           address: string;
           reference?: string | null;
+          package_id?: string | null;
           package_title: string;
           quantity: number;
           unit_price: number;
@@ -51,10 +55,12 @@ export interface Database {
           id?: string;
           full_name?: string;
           phone?: string;
+          dni?: string | null;
           department?: string;
           district?: string;
           address?: string;
           reference?: string | null;
+          package_id?: string | null;
           package_title?: string;
           quantity?: number;
           unit_price?: number;
@@ -67,6 +73,38 @@ export interface Database {
           assigned_seller_id?: string | null;
           created_at?: string;
           updated_at?: string;
+        };
+      };
+      lead_items: {
+        Row: {
+          id: string;
+          lead_id: string;
+          package_id: string | null;
+          product_title: string;
+          quantity: number;
+          unit_price: number;
+          subtotal: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          lead_id: string;
+          package_id?: string | null;
+          product_title: string;
+          quantity: number;
+          unit_price: number;
+          subtotal: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          lead_id?: string;
+          package_id?: string | null;
+          product_title?: string;
+          quantity?: number;
+          unit_price?: number;
+          subtotal?: number;
+          created_at?: string;
         };
       };
       landing_blocks: {

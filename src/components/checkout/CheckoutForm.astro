@@ -203,6 +203,7 @@ import { PERU_LOCATIONS, DEPARTMENTS } from '../../data/peruLocations';
           district,
           address,
           reference: reference || null,
+          package_id: currentPkg.id,
           package_title: currentPkg.title,
           quantity: currentPkg.quantity,
           unit_price: pricing.totalBasePrice / currentPkg.quantity,
@@ -218,6 +219,20 @@ import { PERU_LOCATIONS, DEPARTMENTS } from '../../data/peruLocations';
           console.error('[Checkout] Error saving lead to Supabase:', error.message);
         } else {
           console.log('[Checkout] Lead saved:', leadId);
+
+          // Insert lead item
+          const { error: itemError } = await supabase.from('lead_items').insert({
+            lead_id: leadId,
+            package_id: currentPkg.id,
+            product_title: currentPkg.title,
+            quantity: currentPkg.quantity,
+            unit_price: pricing.totalBasePrice / currentPkg.quantity,
+            subtotal: pricing.totalBasePrice / currentPkg.quantity,
+          });
+
+          if (itemError) {
+            console.warn('[Checkout] Error saving lead item:', itemError.message);
+          }
         }
       } catch (err) {
         console.warn('[Checkout] Supabase insert failed:', err);
