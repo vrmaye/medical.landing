@@ -4,6 +4,7 @@ import DynamicBlockRenderer from '../components/builder/DynamicBlockRenderer.ast
 import CheckoutModal from '../components/checkout/CheckoutModal.astro';
 import ExitIntentModal from '../components/retention/ExitIntentModal.astro';
 import { landingService } from '../services/landing.service';
+import { storeConfig } from '../data/config';
 import type { Database } from '../supabase/database.types';
 import type { LandingBlock } from '../types/landing';
 
@@ -45,20 +46,28 @@ function mapBlock(row: LandingBlockRow): LandingBlock | null {
 
 let landingBlocks: LandingBlock[] = [];
 let headerText = 'OFERTA DE HOY: HASTA 40% OFF + ENVÍO GRATIS Y PAGO CONTRA ENTREGA';
+let whatsappNumber = storeConfig.whatsappNumber;
 
 try {
-  const [rows, headerConfig] = await Promise.all([
+  const [rows, headerConfig, globalConfig] = await Promise.all([
     landingService.getBlocks(true),
     landingService.getHeaderConfig(),
+    landingService.getGlobalConfig(),
   ]);
   landingBlocks = rows.map(mapBlock).filter(Boolean) as LandingBlock[];
   if (headerConfig?.text) {
     headerText = headerConfig.text;
   }
+  if (globalConfig?.whatsappNumber) {
+    whatsappNumber = globalConfig.whatsappNumber;
+  }
 } catch (e) {
   console.warn('[index] Supabase failed:', e);
   landingBlocks = [];
 }
+
+const advisorMessage = 'Quiero que me llamen, tengo algunas preguntas antes de comprar';
+const advisorWaUrl = `https://wa.me/${whatsappNumber.replace(/\D/g, '')}?text=${encodeURIComponent(advisorMessage)}`;
 ---
 
 <Layout title="Spray de Propóleo Natural | Promoción Exclusiva Contra Entrega">
@@ -68,9 +77,66 @@ try {
     <span>{headerText}</span>
   </div>
 
-  <main class="w-full max-w-xl mx-auto flex flex-col items-center pb-28">
-    <div id="landing-blocks" class="min-h-[600px]">
+  <main class="w-full max-w-xl mx-auto flex flex-col items-center pb-32">
+    <div id="landing-blocks" class="min-h-[600px] w-full">
       <DynamicBlockRenderer blocks={landingBlocks} />
+    </div>
+
+    <!-- Botón de Asesor WhatsApp al final de la landing (Amigable y Llamativo) -->
+    <div class="w-full px-3 mt-8 mb-4">
+      <div class="w-full bg-gradient-to-b from-slate-900 to-slate-950 border border-emerald-500/40 rounded-3xl p-4 sm:p-5 shadow-2xl shadow-emerald-950/60 text-center relative overflow-hidden">
+        <!-- Glow decorativo superior -->
+        <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-40 h-20 bg-emerald-500/15 blur-2xl pointer-events-none rounded-full"></div>
+
+        <!-- Header amigable con Asesora en línea -->
+        <div class="flex items-center justify-center gap-3 mb-2.5">
+          <div class="relative">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-400 p-0.5 shadow-md flex items-center justify-center text-2xl">
+              👩‍⚕️
+            </div>
+            <!-- Indicador verde pulsante 'En Línea' -->
+            <span class="absolute bottom-0 right-0 flex h-3.5 w-3.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-slate-900"></span>
+            </span>
+          </div>
+          <div class="text-left">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-black text-white">Dra. Asesora de Salud</span>
+              <span class="bg-emerald-500/20 text-emerald-300 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-500/30 uppercase tracking-wide">
+                En línea
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-400">Atención personalizada y sin compromiso</p>
+          </div>
+        </div>
+
+        <p class="text-xs text-slate-300 mb-3.5 leading-relaxed px-1">
+          ¿Tenés alguna consulta sobre el propóleo, formas de uso o el pago contra entrega?
+        </p>
+
+        <!-- Botón de Acción Principal -->
+        <a
+          id="advisor-whatsapp-btn"
+          href={advisorWaUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="w-full group relative flex flex-col items-center justify-center py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#25D366] via-[#22c55e] to-[#16a34a] hover:from-[#20bd5a] hover:to-[#15803d] text-white font-black shadow-lg shadow-emerald-600/30 hover:shadow-emerald-500/50 border border-emerald-300/40 transition-all duration-300 transform active:scale-95 cursor-pointer text-center"
+        >
+          <span class="text-[11px] sm:text-xs font-black text-amber-100 uppercase tracking-wider mb-0.5 flex items-center justify-center gap-1 drop-shadow-sm">
+            <span>✨</span> ANTES DE COMPRAR <span>✨</span>
+          </span>
+          <div class="flex items-center justify-center gap-2 text-base sm:text-lg font-black uppercase tracking-wide leading-tight drop-shadow-md">
+            <svg class="w-5 h-5 fill-current flex-shrink-0 animate-bounce" viewBox="0 0 24 24">
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+            </svg>
+            <span>QUIERO HABLAR CON UNA ASESORA</span>
+          </div>
+          <span class="text-[10px] sm:text-xs font-semibold text-emerald-100 mt-0.5">
+            ⚡ Respuesta inmediata por WhatsApp
+          </span>
+        </a>
+      </div>
     </div>
   </main>
 
@@ -133,9 +199,10 @@ try {
     async function refreshLanding() {
       try {
         const supabase = getSupabaseClient();
-        const [blocksRes, headerRes] = await Promise.all([
+        const [blocksRes, headerRes, globalRes] = await Promise.all([
           supabase.from('landing_blocks').select('*').eq('is_active', true).order('sort_order', { ascending: true }),
           supabase.from('system_settings' as any).select('value').eq('key', 'landing_header_config').maybeSingle(),
+          supabase.from('system_settings' as any).select('value').eq('key', 'landing_global_config').maybeSingle(),
         ]);
 
         if (blocksRes.data && blocksRes.data.length > 0) {
@@ -158,6 +225,16 @@ try {
           const bar = document.getElementById('announcement-bar');
           const span = bar?.querySelector('span:last-child');
           if (span) span.textContent = (headerRes.data.value as any).text;
+        }
+
+        if (globalRes.data?.value && typeof globalRes.data.value === 'object' && 'whatsappNumber' in globalRes.data.value) {
+          const waNum = (globalRes.data.value as any).whatsappNumber;
+          const advisorBtn = document.getElementById('advisor-whatsapp-btn') as HTMLAnchorElement | null;
+          if (advisorBtn && waNum) {
+            const cleanWa = waNum.replace(/\D/g, '');
+            const msg = 'Quiero que me llamen, tengo algunas preguntas antes de comprar';
+            advisorBtn.href = `https://wa.me/${cleanWa}?text=${encodeURIComponent(msg)}`;
+          }
         }
       } catch (e) {
         console.warn('[Landing] Client refresh failed:', e);
